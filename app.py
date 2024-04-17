@@ -1,44 +1,35 @@
 import streamlit as st
-import openai
+from openai import OpenAI
 
-# Set up your OpenAI API key
-openai.api_key = "sk-proj-mFS5RTWRQi3ilvYnUYAnT3BlbkFJ1CDVKFlTvH8u7wtJ3i0O"
+api_key = "sk-proj-mFS5RTWRQi3ilvYnUYAnT3BlbkFJ1CDVKFlTvH8u7wtJ3i0O"
 
-# Function to generate itinerary using OpenAI API
-def generate_itinerary(destination, budget, days):
-    # Define the prompt
-    prompt = f"Generate a {days}-day itinerary for a trip to {destination} with a budget of ${budget}. Include activities, attractions, and places to visit."
+client = OpenAI(api_key=api_key)
 
-    # Generate response using the GPT-3 model
-    response = openai.Completion.create(
+def generate_itinerary(destination, budget, num_days):
+    prompt = f"User is planning a trip from their current location to {destination} with a budget of {budget} and plans to stay for {num_days} days. Generate a personalized itinerary based on these details."
+
+    response = client.completions.create(
         model="gpt-3.5-turbo",
-        prompt=prompt,
-        temperature=0.5,
-        max_tokens=150
+        prompt=prompt
     )
-
-    # Extract the generated itinerary from the response
     itinerary = response.choices[0].text.strip()
     
     return itinerary
 
-# Streamlit UI
 def main():
     st.title("Travel Activity Planner")
 
-    # Get user inputs
-    destination = st.text_input("Enter destination:")
-    budget = st.number_input("Enter budget:")
-    days = st.number_input("Enter number of days:")
+    destination = st.text_input("Destination", "")
+    budget = st.number_input("Budget", min_value=0, step=100, value=1000)
+    num_days = st.number_input("Number of Days", min_value=1, step=1, value=3)
 
-    # Generate itinerary button
     if st.button("Generate Itinerary"):
-        if destination and budget and days:
-            itinerary = generate_itinerary(destination, budget, days)
-            st.success("Here's your itinerary:")
+        if destination:
+            itinerary = generate_itinerary(destination, budget, num_days)
+            st.subheader("Generated Itinerary:")
             st.write(itinerary)
         else:
-            st.warning("Please fill in all fields.")
+            st.error("Please enter a destination.")
 
 if __name__ == "__main__":
     main()
