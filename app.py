@@ -1,7 +1,7 @@
 import streamlit as st
 import openai
 
-api_key = "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"
+api_key = ""
 openai.api_key = api_key
 
 def generate_itinerary(destination, budget, num_days):
