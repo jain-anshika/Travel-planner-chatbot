@@ -1,17 +1,22 @@
 import streamlit as st
 import openai
 
-api_key = ""
+api_key = "API-KEY"
 openai.api_key = api_key
 
 def generate_itinerary(destination, budget, num_days):
     prompt = f"User is planning a trip from their current location to {destination} with a budget of {budget} and plans to stay for {num_days} days. Generate a personalized itinerary based on these details."
 
-    response = openai.Completion.create(
+    response = openai.chat.completions.create(
         model="gpt-3.5-turbo",
-        prompt=prompt
+    messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
     )
-    itinerary = response.choices[0].text.strip()
+    itinerary = response.choices[0].message.content
     
     return itinerary
 
